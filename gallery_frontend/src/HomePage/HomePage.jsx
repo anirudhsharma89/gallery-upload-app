@@ -5,7 +5,14 @@ import { connect } from "react-redux";
 import { userActions } from "../actions";
 import { GalleryPage } from "../components/galleries";
 
-class HomePage extends React.Component {
+class HomePage extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      gelleryUserId: null
+    };
+    this.gelleryId = null;
+  }
   componentDidMount() {
     this.props.getUsers();
   }
@@ -14,8 +21,16 @@ class HomePage extends React.Component {
     return e => this.props.deleteUser(id);
   }
 
+  handleViewGallery(id) {
+    return e => this.setState({ gelleryUserId: id });
+  }
+
   render() {
     const { user, users } = this.props;
+    if (user && user.id) {
+      this.gelleryId =
+        this.state.gelleryUserId != null ? this.state.gelleryUserId : user.id;
+    }
     return (
       <div>
         <header>
@@ -34,7 +49,7 @@ class HomePage extends React.Component {
         <div>
           <div>
             <h3>Your Photos Gallery</h3>
-            <GalleryPage userId={user.id} />
+            <GalleryPage userId={this.gelleryId} />
           </div>
           <div>
             <h3>All registered users:</h3>
@@ -47,6 +62,11 @@ class HomePage extends React.Component {
                 {users.items.map((user, index) => (
                   <li key={user.id}>
                     {user.firstName + " " + user.lastName}
+                    <span style={{ paddingLeft: "20px" }}>
+                      <a onClick={this.handleViewGallery(user.id)}>
+                        View Gallery
+                      </a>
+                    </span>
                     {user.deleting ? (
                       <em> - Deleting...</em>
                     ) : user.deleteError ? (
@@ -55,7 +75,7 @@ class HomePage extends React.Component {
                         - ERROR: {user.deleteError}
                       </span>
                     ) : (
-                      <span>
+                      <span style={{ paddingLeft: "20px" }}>
                         {" "}
                         - <a onClick={this.handleDeleteUser(user.id)}>Delete</a>
                       </span>

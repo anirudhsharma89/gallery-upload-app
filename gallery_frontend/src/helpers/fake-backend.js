@@ -118,19 +118,9 @@ export function configureFakeBackend() {
         if (url.endsWith("/users/gallery_upload") && opts.method === "POST") {
           // get new user object from post body
           let newGallery = JSON.parse(opts.body);
-          //   console.log("777777777", galleries);
           galleries.push(newGallery);
-
-          // validation
-          //   let duplicateUser = galleries.filter(gallery => {
-          //     return gallery.userId === newGallery.userId;
-          //   }).length;
-          //   if (duplicateUser) {
-          //     galleries.file.push(newGallery.file);
-          //   } else {
-          //     galleries.push(newGallery);
-          //   }
           localStorage.setItem("galleries", JSON.stringify(galleries));
+          // console.log("galleries+++++++++++", galleries);
 
           // respond 200 OK
           resolve({ ok: true, text: () => Promise.resolve() });
@@ -139,21 +129,37 @@ export function configureFakeBackend() {
         }
 
         // get all gallery
-        if (url.endsWith("/users/gallery") && opts.method === "GET") {
-          // check for fake auth token in header and return users if valid, this security is implemented server side in a real application
+        // url.match(/\/gallery\/\d+$/) && opts.method === "GET"
+        if (url.match(/\/gallery\/\d+$/) && opts.method === "GET") {
+          let galleryFiles = [];
+          let urlParts = url.split("/");
+          let id = parseInt(urlParts[urlParts.length - 1]);
+          // console.log("id==========", id);
+          // let matchedUsers = galleries.filter(gallery => {
+          //   return gallery.userId === id;
+          // });
+          // let user = matchedUsers.length ? matchedUsers[0] : null;
+
+          galleries.filter(gallery => {
+            if (gallery.userId == id) {
+              gallery.file.filter(file => {
+                galleryFiles.push(file);
+              });
+            }
+          });
+
           if (
             opts.headers &&
             opts.headers.Authorization === "Bearer fake-jwt-token"
           ) {
             resolve({
               ok: true,
-              text: () => Promise.resolve(JSON.stringify(galleries))
+              text: () => Promise.resolve(JSON.stringify(galleryFiles))
             });
           } else {
             // return 401 not authorised if token is null or invalid
             reject("Unauthorised");
           }
-
           return;
         }
 

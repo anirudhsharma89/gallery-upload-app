@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { galleryActions } from "../actions";
 
-class GalleryPage extends Component {
+class GalleryPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -14,17 +14,14 @@ class GalleryPage extends Component {
     this.fileObj = [];
     this.fileArray = [];
     this.uploadedFiles = [];
+    this.galleryImg = [];
     this.uploadMultipleFiles = this.uploadMultipleFiles.bind(this);
     this.uploadFiles = this.uploadFiles.bind(this);
   }
 
-  componentDidMount() {
-    // this.props.getAllGallary();
+  componentWillMount() {
+    this.props.getAllGallary(this.state.userId);
   }
-
-  //   handleDeleteUser(id) {
-  //     return e => this.props.deleteUser(id);
-  //   }
 
   uploadMultipleFiles(e) {
     this.fileObj.push(e.target.files);
@@ -42,33 +39,40 @@ class GalleryPage extends Component {
       this.uploadedFiles.push(URL.createObjectURL(this.fileObj[0][i]));
     }
     this.setState({ file: this.uploadedFiles });
-    console.log("%%%%%%%%%%%%%", this.state);
 
     if (this.uploadedFiles.length > 0) {
       this.props.galleryUpload(this.state);
+      this.props.getAllGallary(this.state.userId);
     }
     this.fileObj = [];
     this.fileArray = [];
   }
 
   render() {
-    // const { user, users } = this.props;
-    console.log("this.props$444444444444444", this.props);
+    const { gallery } = this.props;
+    this.galleryImg = gallery.gallery;
 
     return (
       <form>
         <div className="form-group multi-preview">
-          {(this.uploadedFiles || []).map(url => (
+          {(this.galleryImg || []).map((url, i) => (
             <img
+              key={i}
               src={url}
-              style={{ width: "100px", height: "100px" }}
+              style={{
+                width: "150px",
+                height: "150px",
+                paddingRight: "10px",
+                paddingLeft: "10px"
+              }}
               alt="..."
             />
           ))}
         </div>
         <div className="form-group multi-preview">
-          {(this.fileArray || []).map(url => (
+          {(this.fileArray || []).map((url, i) => (
             <img
+              key={i}
               src={url}
               style={{ width: "50px", height: "50px" }}
               alt="..."
@@ -97,14 +101,13 @@ class GalleryPage extends Component {
 }
 
 function mapState(state) {
-  const { registering } = state.registration;
-  return { registering };
+  const { gallery } = state;
+  return { gallery };
 }
 
 const actionCreators = {
   galleryUpload: galleryActions.galleryUpload,
   getAllGallary: galleryActions.getAllGallary
-  //   deleteUser: userActions.delete
 };
 
 const connectedGallaryPage = connect(mapState, actionCreators)(GalleryPage);

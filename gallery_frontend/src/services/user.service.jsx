@@ -25,7 +25,6 @@ function login(username, password) {
     .then(user => {
       // store user details and jwt token in local storage to keep user logged in between page refreshes
       localStorage.setItem("user", JSON.stringify(user));
-
       return user;
     });
 }
@@ -72,8 +71,9 @@ function getAllGallery(userId) {
     method: "GET",
     headers: authHeader()
   };
+  console.log("userId&&&&&&&&&&&", userId);
 
-  return fetch(`${config.apiUrl}/users/gallery/${userId}`, requestOptions).then(
+  return fetch(`${config.apiUrl}/gallery/${userId}`, requestOptions).then(
     handleResponse
   );
 }
@@ -127,8 +127,6 @@ function handleResponse(response) {
       const error = (data && data.message) || response.statusText;
       return Promise.reject(error);
     }
-    console.log("data!1111111111111111111", data);
-
     return data;
   });
 }

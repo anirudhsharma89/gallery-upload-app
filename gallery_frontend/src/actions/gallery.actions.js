@@ -35,11 +35,11 @@ function galleryUpload(files) {
   }
 }
 
-function getAllGallary() {
+function getAllGallary(userId) {
   return dispatch => {
     dispatch(request());
 
-    userService.getAllGallery().then(
+    userService.getAllGallery(userId).then(
       gallery => dispatch(success(gallery)),
       error => dispatch(failure(error.toString()))
     );
@@ -49,7 +49,7 @@ function getAllGallary() {
     return { type: galleryConstants.GALLERY_REQUEST };
   }
   function success(gallery) {
-    return { type: galleryConstants.GETALLGALLERY_SUCCESS, gallery };
+    return { type: galleryConstants.GETALLGALLERY_SUCCESS, gallery: gallery };
   }
   function failure(error) {
     return { type: galleryConstants.GETALLGALLERY_FAILURE, error };
